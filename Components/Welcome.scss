@@ -1,0 +1,19 @@
+$yellow: yellow;
+$lightblue: lightblue;
+$fontSizeLarge: 43px;
+$fontSizeMedium: 30px;
+
+.appName {
+  color: $yellow;
+  font-size: $fontSizeLarge;
+  margin-top: 90px;
+  text-align: center;
+}
+
+.appDescription {
+  color: $lightblue;
+  font-size: $fontSizeMedium;
+  margin-top: 10px;
+  margin-bottom: 90px;
+  text-align: center;
+}
