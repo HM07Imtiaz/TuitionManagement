@@ -11,7 +11,6 @@ const Rating = () => {
   useEffect(() => {
     const user = firebase.auth().currentUser;
     if (user) {
-      // Fetch the user's rating if available
       const unsubscribe = firebase.firestore().collection('ratings').doc(user.uid)
         .onSnapshot((snapshot) => {
           const data = snapshot.data();
@@ -55,16 +54,13 @@ const Rating = () => {
     }
 
     try {
-      // Check if the user has already submitted a rating
       if (userRating !== null) {
-        // Update the existing rating document
         await firebase.firestore().collection('ratings').doc(user.uid).update({
           rating,
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         });
         Alert.alert('Success', 'Rating updated successfully.');
       } else {
-        // Add a new document to the ratings collection
         await firebase.firestore().collection('ratings').doc(user.uid).set({
           rating,
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -83,7 +79,7 @@ const Rating = () => {
         style={[styles.starButton, userRating === value ? styles.selectedStar : null]}
         onPress={() => setRating(value)}
       >
-        <MaterialIcons name="star" size={24} color={userRating === value ? 'gold' : 'gray'} />
+        <MaterialIcons name="star" size={28} color={userRating === value ? 'gold' : 'gray'} />
         <Text style={userRating === value ? styles.selectedStarText : styles.starText}>{value} Star</Text>
       </TouchableOpacity>
     );

@@ -30,19 +30,17 @@ const Media = () => {
 
   const addMedia = async () => {
     try {
-      // Extract media ID from the shared link
+      
       const mediaId = extractMediaId(currentLink);
       if (!mediaId) {
         throw new Error('Invalid media link');
       }
       
-      // Add the media link to Firestore
       const mediaLinksRef = firebase.firestore().collection('mediaLinks').doc(userId);
       await mediaLinksRef.set({
         links: [...mediaLinks, mediaId]
       });
       
-      // Update the state
       setMediaLinks([...mediaLinks, mediaId]);
       setCurrentLink('');
     } catch (error) {
@@ -52,7 +50,6 @@ const Media = () => {
 
   const deleteMedia = async (index) => {
     try {
-      // Remove the media link from Firestore
       const updatedMediaLinks = [...mediaLinks];
       updatedMediaLinks.splice(index, 1);
       const mediaLinksRef = firebase.firestore().collection('mediaLinks').doc(userId);
@@ -60,7 +57,6 @@ const Media = () => {
         links: updatedMediaLinks
       });
       
-      // Update the state
       setMediaLinks(updatedMediaLinks);
     } catch (error) {
       console.error('Error deleting media link:', error);
@@ -68,7 +64,7 @@ const Media = () => {
   };
 
   const extractMediaId = (link) => {
-    // Example: Extract YouTube video ID from the shared link
+
     const match = link.match(/(?:youtu\.be\/|youtube\.com\/(?:.*\/|v\/|.*[?&]v=))([^?&]+)/);
     return match ? match[1] : null;
   };

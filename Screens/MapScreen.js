@@ -9,8 +9,8 @@ const MapScreen = () => {
         uri: 'https://www.google.com/maps',
       }}
       style={styles.map}
-      geolocationEnabled={true} // Enable geolocation access
-      originWhitelist={['*']} // Allow all origins
+      geolocationEnabled={true} 
+      originWhitelist={['*']} 
     />
   );
 };

@@ -18,13 +18,13 @@ const Post = ({ navigation }) => {
   const [cvImage, setCvImage] = useState(null);
   const [cvSelected, setCvSelected] = useState(false);
 
-  const [selectedLocation, setSelectedLocation] = useState(null); // State to store selected location
+  const [selectedLocation, setSelectedLocation] = useState(null); 
 
 
   const handleImageSelection = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: 'image/jpeg', // Specify the type for image CVs
+        type: 'image/jpeg', 
       });
 
       if (!result.cancelled) {
@@ -38,15 +38,14 @@ const Post = ({ navigation }) => {
 
 
   const handleLocationSelect = (location) => {
-    setSelectedLocation(location); // Set selected location
+    setSelectedLocation(location); 
   };
 
-  const handleLocationSelection = () => {
-    // Part where you navigate to PostLocation
+  /*const handleLocationSelection = () => {
   const postRef = firebase.firestore().collection('posts').doc();
   navigation.navigate('PostLocation', { postId: postRef.postId });
 
-  };
+  }; */
 
   const handleSubmit = async () => {
     if (!description || !title || !district || !address) {
@@ -57,8 +56,7 @@ const Post = ({ navigation }) => {
     try {
       const userId = firebase.auth().currentUser.uid;
       const postRef = firebase.firestore().collection('posts').doc();
-      
-      // Only set cvImageUrl if cvImage is available
+    
       const cvImageUrl = cvImage ? cvImage : null;
   
       await postRef.set({
@@ -78,7 +76,6 @@ const Post = ({ navigation }) => {
       });
   
       Alert.alert('Success', 'Post submitted successfully!');
-      // Reset state after successful submission
       setTitle('');
       setDescription('');
       setDistrict('');
@@ -87,7 +84,8 @@ const Post = ({ navigation }) => {
       setExperience('');
       setRemuneration('');
       setCvImage(null);
-      setCvSelected(false); // Reset cvSelected state as well
+      setCvSelected(false); 
+      setSelectedLocation('');
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'An error occurred. Please try again.');
@@ -122,7 +120,7 @@ const Post = ({ navigation }) => {
       );
   
       const imageUrl = response.data.url;
-      setCvImage(imageUrl); // Update cvImage state with the uploaded image URL
+      setCvImage(imageUrl); 
       setCvSelected(true);
   
     } catch (error) {
@@ -241,8 +239,12 @@ const styles = StyleSheet.create({
   uploadCv: {
     fontSize: 16,
     color: 'blue',
-    textAlign: 'center',
     padding: 10,
+    borderColor: 'grey',
+    borderWidth: 1,
+    marginRight: 200,
+    marginTop: 10,
+    marginBottom: 10,
   },
   uploadedCvImage: {
     width: 200,
@@ -252,7 +254,12 @@ const styles = StyleSheet.create({
   selectLocationButton: {
     fontSize: 16,
     color: 'blue',
-    marginBottom: 10,
+    marginBottom: 30,
+    borderColor: 'grey',
+    borderWidth: 1,
+    marginRight: 150,
+    padding: 10,
+    marginTop: 10,
   },
   selectedLocationText: {
     fontSize: 16,

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Button, Image, Alert, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
+import { Picker } from '@react-native-picker/picker';
 import { firebase } from '../firebaseConfig';
 import axios from 'axios';
 import Navbar from '../Components/Navbar';
@@ -10,19 +11,29 @@ import SideBar from '../Components/SideBar';
 const Profile = ({ navigation }) => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [type, setType] = useState('');
   const [fullName, setFullName] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [educationBackground, setEducationBackground] = useState('');
   const [gender, setGender] = useState('');
   const [address, setAddress] = useState('');
+  const [about, setAbout] = useState('');
   const [profilePic, setProfilePic] = useState('');
   const [cv, setCv] = useState('');
   const [cvUploaded, setCvUploaded] = useState(false);
   const [profilePicSelected, setProfilePicSelected] = useState(false);
   const [cvSelected, setCvSelected] = useState(false);
+  const [currentOccupation, setCurrentOccupation] = useState('');
+  const [occupationType, setOccupationType] = useState('');
+  const [showStudyFields, setShowStudyFields] = useState(false);
+  const [currentYear, setCurrentYear] = useState('');
+  const [currentInstitution, setCurrentInstitution] = useState('');
+  const [experience, setExperience] = useState('');
+  const [eduQualification, setEduQualification] = useState('');
+
 
   useEffect(() => {
-    // Fetch user's profile data when component mounts
+    
     const fetchProfileData = async () => {
       try {
         const user = firebase.auth().currentUser;
@@ -30,25 +41,34 @@ const Profile = ({ navigation }) => {
           throw new Error('User not found');
         }
 
-        // Retrieve user's profile data from Firestore
         const profileSnapshot = await firebase.firestore().collection('users').doc(user.uid).get();
         const profileData = profileSnapshot.data();
 
-        // Set state with retrieved profile data
         if (profileData) {
+          setType(profileData.type || '');
           setFullName(profileData.fullName || '');
           setMobileNumber(profileData.mobileNumber || '');
           setEducationBackground(profileData.educationBackground || '');
           setGender(profileData.gender || '');
           setAddress(profileData.address || '');
+          setAbout(profileData.about || '');
           setProfilePic(profileData.profilePic || '');
+          setCurrentOccupation(profileData.currentOccupation || '');
+          setEduQualification(profileData.eduQualification || '');
+          setExperience(profileData.experience || '');
           setCv(profileData.cv || '');
           if (profileData.cv) {
-            setCvUploaded(true); // Set to true if CV URL is available
+            setCvUploaded(true); 
           }
           if (profileData.profilePic) {
             setProfilePicSelected(true);
           }
+          if (profileData.currentOccupation === 'Study') {
+            setShowStudyFields(true);
+            setCurrentYear(profileData.currentYear || '');
+            setCurrentInstitution(profileData.currentInstitution || '');
+          }
+          setOccupationType(profileData.currentOccupation || '');
         }
       } catch (error) {
         console.error('Error fetching profile data:', error);
@@ -77,7 +97,7 @@ const Profile = ({ navigation }) => {
   const handleCVSelection = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: 'image/jpeg', // Specify the type for image CVs
+        type: 'image/jpeg', 
       });
 
       if (!result.cancelled) {
@@ -170,11 +190,15 @@ const Profile = ({ navigation }) => {
         throw new Error('Please fill in all fields');
       }
 
+      if (mobileNumber.length !== 11) {
+        alert('Not A valid Mobile number! Mobile number must have 11 digits.');
+        return;
+      }
+
       if (!profilePicSelected) {
         throw new Error('Please select a profile picture');
       }
 
-      // Save user profile data to Firestore
       const userData = {
         userId: user.uid,
         fullName,
@@ -182,11 +206,18 @@ const Profile = ({ navigation }) => {
         educationBackground,
         gender,
         address,
+        about,
+        eduQualification,
+        experience,
+        currentOccupation: occupationType,
         profilePic: profilePicSelected ? profilePic : '',
         cv: cvSelected ? cv : '',
+        currentYear: occupationType === 'Study' ? currentYear : '',
+        currentInstitution: occupationType === 'Study' ? currentInstitution : '',
+      
       };
 
-      await firebase.firestore().collection('users').doc(user.uid).set(userData);
+      await firebase.firestore().collection('users').doc(user.uid).update(userData);
 
       Alert.alert('Success', 'Your profile has been updated');
     } catch (error) {
@@ -208,6 +239,9 @@ const Profile = ({ navigation }) => {
                 {profilePic ? <Image source={{ uri: profilePic }} style={{ width: '100%', height: '100%', borderRadius: 50 }} /> : <Text style={{ textAlign: 'center', lineHeight: 100 }}>Select Pic</Text>}
               </View>
             </TouchableOpacity>
+            <View style={{marginBottom: 10}}>
+              <Text style={{fontSize: 17}}>{type}</Text>
+            </View>
             <View style={{ width: '80%' }}>
               <View style={{ marginBottom: 10 }}>
                 <Text style={{ fontSize: 20, marginBottom: 5 }}>Full name</Text>
@@ -242,11 +276,68 @@ const Profile = ({ navigation }) => {
                 />
               </View>
               <View style={{ marginBottom: 10 }}>
+                <Text style={{ fontSize: 20, marginBottom: 5 }}>Educational Qualification</Text>
+                <TextInput
+                  style={{ borderWidth: 1, borderColor: 'gray', padding: 5, fontSize: 20 }}
+                  value={eduQualification}
+                  onChangeText={setEduQualification}
+                />
+              </View>
+              <View style={{ marginBottom: 10 }}>
+              <Text style={{ fontSize: 20, marginBottom: 5 }}>Current Occupation</Text>
+              <Picker
+                selectedValue={occupationType}
+                onValueChange={(itemValue, itemIndex) => setOccupationType(itemValue)}
+                style={{ height: 50, width: '100%', borderWidth: 1, borderColor: 'gray', marginBottom: 10 }}>
+                <Picker.Item label="Select Occupation" value="" />
+                <Picker.Item label="Study" value="Study" />
+                <Picker.Item label="Business" value="Business" />
+                <Picker.Item label="Job" value="Job" />
+              </Picker>
+            </View>
+            {occupationType === 'Study' && (
+              <>
+                <View style={{ marginBottom: 10 }}>
+                  <Text style={{ fontSize: 20, marginBottom: 5 }}>Current Study Year</Text>
+                  <TextInput
+                    style={{ borderWidth: 1, borderColor: 'gray', padding: 5, fontSize: 20 }}
+                    value={currentYear}
+                    onChangeText={setCurrentYear}
+                  />
+                </View>
+                <View style={{ marginBottom: 10 }}>
+                  <Text style={{ fontSize: 20, marginBottom: 5 }}>Current Institution Name</Text>
+                  <TextInput
+                    style={{ borderWidth: 1, borderColor: 'gray', padding: 5, fontSize: 20 }}
+                    value={currentInstitution}
+                    onChangeText={setCurrentInstitution}
+                  />
+                </View>
+              </>
+              )}
+
+              <View style={{ marginBottom: 10 }}>
+                <Text style={{ fontSize: 20, marginBottom: 5 }}>Experience of Teaching</Text>
+                <TextInput
+                  style={{ borderWidth: 1, borderColor: 'gray', padding: 5, fontSize: 20 }}
+                  value={experience}
+                  onChangeText={setExperience}
+                />
+              </View>
+              <View style={{ marginBottom: 10 }}>
                 <Text style={{ fontSize: 20, marginBottom: 5 }}>Address</Text>
                 <TextInput
                   style={{ borderWidth: 1, borderColor: 'gray', padding: 5, fontSize: 20 }}
                   value={address}
                   onChangeText={setAddress}
+                />
+              </View>
+              <View style={{ marginBottom: 10 }}>
+                <Text style={{ fontSize: 20, marginBottom: 5 }}>Write About You</Text>
+                <TextInput
+                  style={{ borderWidth: 1, borderColor: 'gray', padding: 5, fontSize: 20 }}
+                  value={about}
+                  onChangeText={setAbout}
                 />
               </View>
               <TouchableOpacity onPress={handleCVSelection}>
