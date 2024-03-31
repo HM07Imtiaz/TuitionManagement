@@ -8,7 +8,8 @@ const ShowPosts = ({ navigation }) => {
 
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedDate, setSelectedDate] = useState(null); // State to store selected date
+  const [selectedDate, setSelectedDate] = useState(null); 
+  const [usersData, setUsersData] = useState({}); 
   const postsPerPage = 5;
 
   useEffect(() => {
@@ -17,8 +18,22 @@ const ShowPosts = ({ navigation }) => {
       setPosts(updatedPosts);
     });
 
-    return () => unsubscribe();
+    const usersRef = firebase.firestore().collection('users');
+    const unsubscribeUsers = usersRef.onSnapshot(snapshot => {
+      const users = {};
+      snapshot.forEach(doc => {
+        users[doc.id] = doc.data();
+      });
+      setUsersData(users);
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeUsers();
+    };
   }, []);
+
+  
 
   const calculateTotalPages = () => {
     const filteredPosts = selectedDate ? posts.filter(post => post.createdAt.toDate().toDateString() === selectedDate.toDateString()) : posts;
@@ -27,7 +42,6 @@ const ShowPosts = ({ navigation }) => {
   const totalPages = calculateTotalPages();
 
   const currentPosts = () => {
-    // Filter posts based on the selected date
     const filteredPosts = selectedDate ? posts.filter(post => post.createdAt.toDate().toDateString() === selectedDate.toDateString()) : posts;
     const indexOfLastPost = currentPage * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
@@ -46,6 +60,11 @@ const ShowPosts = ({ navigation }) => {
       setCurrentPage(currentPage - 1);
     }
   };
+
+  const handleUserProfile = (userId) => {
+    navigation.navigate('UserProfile', { userId });
+  };
+
 
 
   const handleLikeDislike = async (postId, isLike) => {
@@ -110,14 +129,13 @@ const ShowPosts = ({ navigation }) => {
 
   const handleSelectDate = (date) => {
     setSelectedDate(date);
-    setCurrentPage(1); // Reset page to 1 when selecting a new date
+    setCurrentPage(1); 
   };
 
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.datePickerContainer}>
-        {/* Render DatePickerComponent and pass handleSelectDate function as prop */}
         <DatePickerComponent onSelectDate={handleSelectDate} />
       </View>
 
@@ -125,8 +143,16 @@ const ShowPosts = ({ navigation }) => {
         currentPosts().map((post) => (
           <TouchableOpacity key={post.id} onPress={() => navigation.navigate('Comment', { postId: post.id })}>
             <View style={styles.card}>
-              <TouchableOpacity onPress={() => navigation.navigate('Profile', { userId: post.userId })}>
-                <Text style={styles.userId}>{post.userId}</Text>
+            <TouchableOpacity onPress={() => handleUserProfile(post.userId)}>
+                <View style={styles.userInfo}>
+                  {usersData[post.userId]?.profilePic && (
+                    <Image source={{ uri: usersData[post.userId].profilePic }} style={styles.profilePic} />
+                  )}
+                  <View style={styles.userDetails}>
+                    <Text style={styles.userName}>{usersData[post.userId]?.fullName || 'Unknown User'}</Text>
+                    <Text style={styles.userType}>{usersData[post.userId]?.type}</Text>
+                  </View>
+                </View>
               </TouchableOpacity>
               <Text>Date: {formatDate(post.createdAt)}</Text>
               <Text>Type: {post.type}</Text>
@@ -137,11 +163,14 @@ const ShowPosts = ({ navigation }) => {
               <Text>Remuneration: {post.remuneration}</Text>
               <Text>Experience: {post.experience}</Text>
               <Text>Qualification: {post.qualification}</Text>
+              {post.selectedLocation && (
+               <Text style={styles.selectedLocationText}>Selected Location: {post.selectedLocation.latitude}, {post.selectedLocation.longitude}</Text>
+              )}
 
-              {post.cvImageUrl && ( // Check if CV is uploaded
+              {post.cvImageUrl && ( 
                 <Image source={{ uri: post.cvImageUrl }} style={styles.cvImage} />
               )}
-              {post.selectedLocation && ( // Check if location is submitted by the user
+              {post.selectedLocation && ( 
                  <TouchableOpacity onPress={() => navigation.navigate('ShowLocation', { selectedLocation: post.selectedLocation })}>
                   <Text style={styles.map}>See Location on Map</Text>
                 </TouchableOpacity>
@@ -211,6 +240,36 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  profilePic: {
+    width: 60,
+    height: 60,
+    borderRadius: 50,
+    marginRight: 15,
+  },
+  profilePicPlaceholder: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+    backgroundColor: 'lightgray',
+  },
+  userDetails: {
+    flexDirection: 'column',
+  },
+  userName: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: 'blue',
+    fontSize: 17,
+  },
+  userType: {
+    color: 'gray',
+  },
   description: {
     marginBottom: 5,
   },
@@ -263,6 +322,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderColor: 'grey',
     borderWidth: 2,
+  },
+  selectedLocationText: {
+    fontSize: 16,
+    marginBottom: 10,
   },
 });
 
