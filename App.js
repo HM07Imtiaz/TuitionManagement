@@ -18,86 +18,103 @@ import {firebase} from './firebaseConfig';
 import PostLocation from './Screens/PostLocation';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import ShowLocation from './Screens/ShowLocation';
-//import Profile from './Screens/Profile';
+import ProfileStudent from './Screens/ProfileStudent';
+import ProfileParent from './Screens/ProfileParent';
+import UserProfile from './Screens/UserProfile';
 
 
 
 const Stack = createNativeStackNavigator();
 
+const AuthStack = () => {
+  return (
+    <Stack.Navigator initialRouteName="WelcomeScreen" screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
+      <Stack.Screen name="LoginScreen" component={LoginScreen} />
+      <Stack.Screen name="SignupScreen" component={SignupScreen} />
+    </Stack.Navigator>
+  );
+};
+
+const HomeStack = () => {
+  return (
+    <Stack.Navigator initialRouteName="HomeScreen" screenOptions={{ headerShown: true }}>
+      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      <Stack.Screen name="Post" component={Post} />
+      <Stack.Screen name="Chat" component={Chat} />
+      <Stack.Screen name='Profile' component={Profile} />
+      <Stack.Screen name="Rating" component={Rating} />
+      <Stack.Screen name="Media" component={Media} />
+      <Stack.Screen name="Search" component={Search} />
+      <Stack.Screen name="ShowPosts" component={ShowPosts} />
+      <Stack.Screen name="Comment" component={Comment} />
+      <Stack.Screen name="MapScreen" component={MapScreen} />
+      <Stack.Screen name="PostLocation" component={PostLocation} />
+      <Stack.Screen name="ShowLocation" component={ShowLocation} />
+      <Stack.Screen name='ProfileParent' component={ProfileParent} />
+      <Stack.Screen name='ProfileStudent' component={ProfileStudent} />
+      <Stack.Screen name='UserProfile' component={UserProfile} />
+    </Stack.Navigator>
+  );
+};
+
+
 function App() {
 
-  const [userType, setUserType] = useState('');
   const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [initializing, setInitializing] = useState(true);
+  //const [user, setUser] = useState();
 
-  useEffect(() => {
-    const fetchUserType = async () => {
-      try {
-        const user = firebase.auth().currentUser;
-        if (user) {
-          const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-          const userData = userDoc.data();
-          console.log('userData:', userData); // Log user data
-          if (userData && userData.type) {
-            setUserType(userData.type);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching user type:', error);
+
+useEffect(() => {
+  const checkSession = async () => {
+    try {
+      const userData = await AsyncStorage.getItem('userData');
+      if (userData) {
+        const { email, password } = JSON.parse(userData);
+        await firebase.auth().signInWithEmailAndPassword(email, password);
+        setUserLoggedIn(true);
+        console.log('check Session: ',userLoggedIn);
       }
-    };
-  
-    fetchUserType();
-  }, []);
+    } catch (error) {
+      console.error('Error checking session:', error);
+    } finally {
+      setInitializing(false);
+    }
+  };
 
-  console.log('userType:', userType); // Log userType
+  checkSession();
+}, []);
 
-  /*
-  useEffect(() => {
-    const checkUserLoggedIn = async () => {
-      try {
-        const storedUser  = await AsyncStorage.getItem('users');
-        const userData = JSON.parse(storedUser);
-        if (userData) {
-          setUserLoggedIn(true); // Set userLoggedIn state to true if user data is found
-        }
-      } catch (error) {
-        console.error('Error checking user login status:', error);
-      } finally {
-        setInitializing(false); // Set initializing state to false after checking
-      }
-    };
+ 
+const onAuthStateChanged = (user) => {
+  setUserLoggedIn(user);
+  console.log('Auth Change: ',user, userLoggedIn);
+};
 
-    checkUserLoggedIn();
-  }, []);
+useEffect(() => {
+  const unsubscribe = firebase.auth().onAuthStateChanged(onAuthStateChanged);
+  console.log('Unsubscribe: ', unsubscribe);
 
-  if (initializing) {
-    // Render loading screen while initializing
-    return null;
-  }
-*/  
+  return () => {
+    if (unsubscribe) {
+      unsubscribe();
+    }
+  };
+}, []);
+
+
+if (initializing) {
+  return null; 
+}
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="SignupScreen" component={SignupScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
-        
-        <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen name="Post" component={Post} />
-        <Stack.Screen name="Chat" component={Chat} />
-        <Stack.Screen name='Profile' component={Profile} />
-        <Stack.Screen name="Rating" component={Rating} />
-        <Stack.Screen name="Media" component={Media} />
-        <Stack.Screen name="Search" component={Search} />
-        <Stack.Screen name="ShowPosts" component={ShowPosts} />
-        <Stack.Screen name="Comment" component={Comment} />
-        <Stack.Screen name="MapScreen" component={MapScreen} />
-        <Stack.Screen name="PostLocation" component={PostLocation} />
-        <Stack.Screen name="ShowLocation" component={ShowLocation} />
-      
-      </Stack.Navigator>
+     {userLoggedIn ? (
+       <HomeStack/>  
+     ) : (
+       <AuthStack/>
+     )}
     </NavigationContainer> 
   );
 }
