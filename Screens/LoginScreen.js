@@ -45,12 +45,13 @@ const LoginScreen = (props) => {
         );
         return;
       }
-      /*try{
-        await AsyncStorage.setItem("users", JSON.stringify(data))
+      try{
+        const userData = { email, password };
+        await AsyncStorage.setItem("userData", JSON.stringify(userData));
+       
       }catch(err){
-        console.log('error store in async storage', err.message)
-    }*/
-      navigation.navigate('HomeScreen');
+        console.log('error store in async storage', err.message);
+    }
     } catch (error) {
       Alert.alert('Error', error.message);
     }
