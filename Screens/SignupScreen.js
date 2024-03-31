@@ -12,6 +12,7 @@ const SignupScreen = ({ navigation }) => {
     email: '',
     password: '',
     confirm_password: '',
+    mobileNumber: '',
     type: '',
     class: '' 
   });
@@ -19,13 +20,20 @@ const SignupScreen = ({ navigation }) => {
   const [showClassDropdown, setShowClassDropdown] = useState(false);
 
   const registerUser = async () => {
-    if(data.type === '' || data.email === '' || data.password === '' || data.confirm_password === ''){
+    if(data.type === '' || data.email === '' || data.password === '' || data.confirm_password === '' || data.mobileNumber === ''){
       alert('Please Fill the all fields..');
       return;
     }
+
+    if (data.mobileNumber.length !== 11) {
+      alert('Not A valid Mobile number! Mobile number must have 11 digits.');
+      return;
+    }
+
     try {
       setShowLoader(true);
       await firebase.auth().createUserWithEmailAndPassword(data.email, data.password)
+
         .then(() => {
           firebase.auth().currentUser.sendEmailVerification({
             handleCodeInApp: true,
@@ -39,6 +47,7 @@ const SignupScreen = ({ navigation }) => {
                 email: '',
                 password: '',
                 confirm_password: '',
+                mobileNumber: '',
                 type: '',
                 class: ''
               });
@@ -51,13 +60,13 @@ const SignupScreen = ({ navigation }) => {
                 email: data.email,
                 password: data.password,
                 type: data.type,
+                class: data.class,
               });
 
               if (data.type === 'Student') {
                 firebase.firestore().collection('students').doc(firebase.auth().currentUser.uid).set({
                   class: data.class,
                   userId: firebase.auth().currentUser.uid,
-                  // Add more student-specific fields as needed
                 });
               }
 
@@ -81,8 +90,7 @@ const SignupScreen = ({ navigation }) => {
   };
 
   const fetchClassOptions = () => {
-    // Fetch class options from your data source and update state
-    // For simplicity, I'm hardcoding the options here
+    
     const classOptions = ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'];
     return classOptions.map((option, index) => (
       <Picker.Item key={index} label={option} value={option} />
@@ -124,6 +132,7 @@ const SignupScreen = ({ navigation }) => {
           <Field placeholder="Email" keyboardType="email-address" value={data.email} onChangeText={(text)=>setData({...data,email:text})} />
           <Field placeholder="Password" secureTextEntry value={data.password} onChangeText={(text)=>setData({...data,password:text})} />
           <Field placeholder="Confirm Password" secureTextEntry value={data.confirm_password} onChangeText={(text)=>setData({...data,confirm_password:text})} />
+          <Field placeholder="Mobile Number" keyboardType="phone-pad" value={data.mobileNumber} onChangeText={(text)=>setData({...data,mobileNumber:text})} /> 
 
           
           <TouchableOpacity
