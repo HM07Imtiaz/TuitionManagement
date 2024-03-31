@@ -1,18 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { WebView } from 'react-native-webview';
+import React from 'react';
+import { View, StyleSheet, Text } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 
 const ShowLocation = ({ route }) => {
-  const { selectedLocation } = route.params; // Retrieve the selected location from route params
+  const { selectedLocation } = route.params; 
 
   return (
     <View style={styles.container}>
-      <WebView
-        source={{ uri: `https://www.google.com/maps?q=${selectedLocation ? selectedLocation.latitude + ',' + selectedLocation.longitude : ''}` }}
+      <MapView
         style={styles.map}
-        geolocationEnabled={true}
-        originWhitelist={['*']}
-      />
+        initialRegion={{
+          latitude: selectedLocation.latitude,
+          longitude: selectedLocation.longitude,
+          latitudeDelta: 0.09,
+          longitudeDelta: 0.07,
+        }}
+      >
+        <Marker
+          coordinate={{
+            latitude: selectedLocation.latitude,
+            longitude: selectedLocation.longitude,
+          }}
+          title="Selected Location"
+          description={`Latitude: ${selectedLocation.latitude}, Longitude: ${selectedLocation.longitude}`}
+        />
+      </MapView>
+      <Text>{selectedLocation.latitude}, {selectedLocation.longitude}</Text>
     </View>
   );
 };
