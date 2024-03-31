@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import Navbar from '../Components/Navbar';
 import SideBar from '../Components/SideBar';
+import {firebase} from '../firebaseConfig'
 
 const HomeScreen = ({ navigation }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -10,33 +11,53 @@ const HomeScreen = ({ navigation }) => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const navigateToProfile = () => {
-    // Navigate to the profile page
-    navigation.navigate('Profile');
-  };
+  const profileNavigation = async () => {
+    try {
+      const user = firebase.auth().currentUser;
+      if (!user) {
+        throw new Error('User not found');
+      }
+      const profileSnapshot = await firebase.firestore().collection('users').doc(user.uid).get();
+      const profileData = profileSnapshot.data();
+
+      if(profileData){
+        if(profileData.type == 'Teacher'){
+          navigation.navigate('Profile');
+        }
+        else if(profileData.type == 'Student'){
+          navigation.navigate('ProfileStudent');
+        }
+        else if(profileData.type == 'Parent'){
+          navigation.navigate('ProfileParent');
+        }
+        else
+        console.error('Invalid user type:', profileData.type);
+
+      }
+
+    }catch (error) {
+      console.error('Error fetching profile data:', error);
+    }
+      
+  }
 
   const navigateToPost = () => {
-    // Navigate to the post page
     navigation.navigate('Post');
   };
 
   const navigateToNewsFeed = () => {
-    // Navigate to the newsfeed page
     navigation.navigate('ShowPosts');
   };
 
   const navigateToRating = () => {
-    // Navigate to the rating page
     navigation.navigate('Rating');
   };
 
   const navigateToMedia = () => {
-    // Navigate to the media page
     navigation.navigate('Media');
   };
 
   const navigateToLocation = () => {
-    // Navigate to the location page
     navigation.navigate('MapScreen');
   };
 
@@ -55,7 +76,7 @@ const HomeScreen = ({ navigation }) => {
           <Text style={{ color: 'lightblue', fontSize: 28, marginTop: 40 }}>Welcome to TuitionLinkHUB</Text>
           <Text style={{ color: 'darkgreen', fontSize: 28, marginTop: 10, marginBottom: 50 }}>"Tuition Management App"</Text>
           <View style={styles.dashboardContainer}>
-            <TouchableOpacity style={styles.dashboardItem} onPress={navigateToProfile}>
+            <TouchableOpacity style={styles.dashboardItem} onPress={profileNavigation}>
               <Text style={styles.dashboardItemText}>Create Your</Text>
               <Text style={styles.dashboardItemText}>Profile First</Text>
               <Text style={styles.dashboardItemLink}>Click here to create</Text>
@@ -73,19 +94,19 @@ const HomeScreen = ({ navigation }) => {
               <Text style={styles.dashboardItemLink}>Click to See Posts</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.dashboardItem} onPress={navigateToRating}>
+            <TouchableOpacity style={styles.dashboardItem} onPress={navigateToMedia}>
               <Text style={styles.dashboardItemText}>You can store</Text>
               <Text style={styles.dashboardItemText}>your videos here</Text>
               <Text style={styles.dashboardItemLink}>Click here for Media</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.dashboardItem} onPress={navigateToMedia}>
+            <TouchableOpacity style={styles.dashboardItem} onPress={navigateToLocation}>
               <Text style={styles.dashboardItemText}>Search Location</Text>
               <Text style={styles.dashboardItemText}>on Map</Text>
               <Text style={styles.dashboardItemLink}>Click here for Map</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.dashboardItem} onPress={navigateToLocation}>
+            <TouchableOpacity style={styles.dashboardItem} onPress={navigateToRating}>
               <Text> </Text>
               <Text style={styles.dashboardItemText}>Rate the App</Text>
               <Text style={styles.dashboardItemLink}>Click here for Rating</Text>

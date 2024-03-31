@@ -1,24 +1,67 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, Text, TouchableOpacity, Button, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { firebase } from '../firebaseConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-//import { ScrollView } from 'react-native-gesture-handler';
+
 
 const Sidebar = ({ onClose }) => {
 
-
+  const [userType, setUserType] = useState('');
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchUserType = async () => {
+      try {
+        const user = firebase.auth().currentUser;
+        if (user) {
+          const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+          const userData = userDoc.data();
+           
+          if (userData && userData.type) {
+            setUserType(userData.type);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user type:', error);
+      }
+    };
+
+    fetchUserType(); 
+  }, [userType]); 
+
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem('users');
-      await firebase.auth().signOut(); // Sign out the user
-      navigation.navigate('WelcomeScreen'); // Navigate to the welcome screen after logout
+      await AsyncStorage.removeItem('userData');
+      await firebase.auth().signOut(); 
     } catch (error) {
       console.error('Error logging out:', error);
     }
   };
+
+  const profileNavigation = async () => {
+    try {
+      if(userType){
+        if(userType == 'Teacher'){
+          navigation.navigate('Profile');
+        }
+        else if(userType == 'Student'){
+          navigation.navigate('ProfileStudent');
+        }
+        else if(userType == 'Parent'){
+          navigation.navigate('ProfileParent');
+        }
+        else
+        console.error('Invalid user type:', userType);
+
+      }
+
+    }catch (error) {
+      console.error('Error fetching profile data:', error);
+    }
+      
+  }
 
 
   return (
@@ -27,7 +70,7 @@ const Sidebar = ({ onClose }) => {
       <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3, marginTop: 3}} onPress={onClose}>
         <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Close</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("Profile")}>
+      <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={profileNavigation}>
         <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Profile</Text>
       </TouchableOpacity>
       <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("ShowPosts")}>
@@ -39,17 +82,14 @@ const Sidebar = ({ onClose }) => {
       <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("Post")}>
         <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Post</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("Rating")}>
-        <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Rating</Text>
-      </TouchableOpacity>
       <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("Media")}>
         <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Media</Text>
       </TouchableOpacity>
       <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("MapScreen")}>
-        <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Map</Text>
+        <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Search Loaction</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("PostLocation")}>
-        <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Post the Location</Text>
+      <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("Rating")}>
+        <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Rating</Text>
       </TouchableOpacity>
       <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("Search")}>
         <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Search</Text>
