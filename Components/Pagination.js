@@ -22,11 +22,17 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     marginTop: 50,
     marginBottom: 30,
+    borderColor: 'white',
+    borderWidth: 1,
+    padding: 10,
   },
   paginationButton: {
     fontSize: 16,
     fontWeight: 'bold',
     color: 'blue',
+    borderWidth: 1,
+    padding: 5,
+    borderColor: 'grey',
   },
   disabled: {
     color: '#ccc',
@@ -34,6 +40,9 @@ const styles = StyleSheet.create({
   pageNumber: {
     fontSize: 16,
     fontWeight: 'bold',
+    borderWidth: 1,
+    padding: 5,
+    borderColor: 'white',
   },
 });
 

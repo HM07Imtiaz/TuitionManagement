@@ -8,7 +8,6 @@ import HomeScreen from './Screens/HomeScreen';
 import Post from './Screens/Post';
 import Profile from './Screens/Profile';
 import Search from './Screens/Search';
-import Chat from './Screens/Chat';
 import Rating from './Screens/Rating';
 import ShowPosts from './Screens/ShowPosts';
 import Comment from './Screens/Comment';
@@ -21,7 +20,17 @@ import ShowLocation from './Screens/ShowLocation';
 import ProfileStudent from './Screens/ProfileStudent';
 import ProfileParent from './Screens/ProfileParent';
 import UserProfile from './Screens/UserProfile';
+import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
+import CountryInfo from './Screens/CountryInfo';
+import CountryScreen from './Screens/CountryScreen';
+import FlagDetection from './Screens/FlagDetection';
 
+
+
+const client = new ApolloClient({
+  uri: 'https://countries.trevorblades.com/graphql',
+  cache: new InMemoryCache(),
+});
 
 
 const Stack = createNativeStackNavigator();
@@ -41,7 +50,6 @@ const HomeStack = () => {
     <Stack.Navigator initialRouteName="HomeScreen" screenOptions={{ headerShown: true }}>
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="Post" component={Post} />
-      <Stack.Screen name="Chat" component={Chat} />
       <Stack.Screen name='Profile' component={Profile} />
       <Stack.Screen name="Rating" component={Rating} />
       <Stack.Screen name="Media" component={Media} />
@@ -54,6 +62,9 @@ const HomeStack = () => {
       <Stack.Screen name='ProfileParent' component={ProfileParent} />
       <Stack.Screen name='ProfileStudent' component={ProfileStudent} />
       <Stack.Screen name='UserProfile' component={UserProfile} />
+      <Stack.Screen name='CountryScreen' component={CountryScreen} />
+      <Stack.Screen name='CountryInfo' component={CountryInfo} />
+      <Stack.Screen name='FlagDetection' component={FlagDetection} />
     </Stack.Navigator>
   );
 };
@@ -70,11 +81,12 @@ useEffect(() => {
   const checkSession = async () => {
     try {
       const userData = await AsyncStorage.getItem('userData');
+      console.log('Retrieved userData from AsyncStorage:', userData)
       if (userData) {
         const { email, password } = JSON.parse(userData);
         await firebase.auth().signInWithEmailAndPassword(email, password);
         setUserLoggedIn(true);
-        console.log('check Session: ',userLoggedIn);
+        console.log('check Session: (user Logged in) ',userLoggedIn);
       }
     } catch (error) {
       console.error('Error checking session:', error);
@@ -88,17 +100,21 @@ useEffect(() => {
 
  
 const onAuthStateChanged = (user) => {
-  setUserLoggedIn(user);
-  console.log('Auth Change: ',user, userLoggedIn);
+  setUserLoggedIn(!!user);
+  console.log('Auth Change: ',user ? 'User is logged in' : 'No user');
+  if (user) {
+    console.log('User details:', user);
+  }
 };
 
 useEffect(() => {
   const unsubscribe = firebase.auth().onAuthStateChanged(onAuthStateChanged);
-  console.log('Unsubscribe: ', unsubscribe);
+  console.log('Subscribed to auth state changes');
 
   return () => {
     if (unsubscribe) {
       unsubscribe();
+      console.log('Unsubscribed from auth state changes');
     }
   };
 }, []);
@@ -109,13 +125,15 @@ if (initializing) {
 }
 
   return (
-    <NavigationContainer>
-     {userLoggedIn ? (
-       <HomeStack/>  
-     ) : (
-       <AuthStack/>
-     )}
-    </NavigationContainer> 
+    <ApolloProvider client={client}>
+      <NavigationContainer>
+        {userLoggedIn ? (
+          <HomeStack/>  
+        ) : (
+          <AuthStack/>
+        )}
+      </NavigationContainer> 
+    </ApolloProvider>
   );
 }
 

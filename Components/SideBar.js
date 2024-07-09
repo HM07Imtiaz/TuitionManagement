@@ -35,6 +35,8 @@ const Sidebar = ({ onClose }) => {
     try {
       await AsyncStorage.removeItem('userData');
       await firebase.auth().signOut(); 
+      console.log('User logged out successfully');
+      // navigation.navigate("WelcomeScreen");
     } catch (error) {
       console.error('Error logging out:', error);
     }
@@ -76,8 +78,8 @@ const Sidebar = ({ onClose }) => {
       <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("ShowPosts")}>
         <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>NewsFeed</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("Chat")}>
-        <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Chat</Text>
+      <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("CountryScreen")}>
+        <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Country Info</Text>
       </TouchableOpacity>
       <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("Post")}>
         <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Post</Text>

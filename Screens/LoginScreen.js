@@ -48,7 +48,7 @@ const LoginScreen = (props) => {
       try{
         const userData = { email, password };
         await AsyncStorage.setItem("userData", JSON.stringify(userData));
-       
+        console.log("User data saved to AsyncStorage: ", userData);
       }catch(err){
         console.log('error store in async storage', err.message);
     }

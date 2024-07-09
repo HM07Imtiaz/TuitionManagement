@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Field from './Field';
 import Background from './Background';
 import Btn from './Btn';
 import { darkGreen } from './Constants';
+import { MaterialIcons } from '@expo/vector-icons';
+import ShowMessage from '../Components/ShowMessage';
 import { firebase } from '../firebaseConfig'; 
 
 const SignupScreen = ({ navigation }) => {
@@ -18,6 +20,9 @@ const SignupScreen = ({ navigation }) => {
   });
   const [showLoader, setShowLoader] = useState(false);
   const [showClassDropdown, setShowClassDropdown] = useState(false);
+  const [emailExists, setEmailExists] = useState(false);
+  const [perfectPass, setPerfectPass] = useState(false);
+  const [passMatched, setPassMatched] = useState(false);
 
   const registerUser = async () => {
     if(data.type === '' || data.email === '' || data.password === '' || data.confirm_password === '' || data.mobileNumber === ''){
@@ -97,6 +102,35 @@ const SignupScreen = ({ navigation }) => {
     ));
   };
 
+  useEffect(() => {
+    const checkEmailAvailability = async () => {
+      try {
+        if (data.email.trim() !== '') {
+          const querySnapshot = await firebase.firestore().collection('users').where('email', '==', data.email).get();
+          setEmailExists(!querySnapshot.empty);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    checkEmailAvailability();
+  }, [data.email])
+
+  useEffect(() => {
+    const checkMatch = async () => {
+      setPassMatched(data.password !== data.confirm_password && data.confirm_password.length > 0);
+    }
+    checkMatch();
+  }, [data.confirm_password])
+
+  useEffect(() => {
+    const checkLength = async () => {
+      setPerfectPass(data.password.length < 6 && data.password.length > 0)
+    }
+    checkLength();
+  }, [data.password])
+
 
   return (
     <Background>
@@ -130,8 +164,11 @@ const SignupScreen = ({ navigation }) => {
           }}>
         
           <Field placeholder="Email" keyboardType="email-address" value={data.email} onChangeText={(text)=>setData({...data,email:text})} />
+          {emailExists && <ShowMessage message="This email is already in use." icon={<MaterialIcons name="error-outline" size={13} color="red" />} color='red' />}
           <Field placeholder="Password" secureTextEntry value={data.password} onChangeText={(text)=>setData({...data,password:text})} />
+          {perfectPass && <ShowMessage message="Password must be at least 6 characters long" icon={<MaterialIcons name="error-outline" size={13} color="red" />} color="red" />}
           <Field placeholder="Confirm Password" secureTextEntry value={data.confirm_password} onChangeText={(text)=>setData({...data,confirm_password:text})} />
+          {passMatched && <ShowMessage message="Both passwords didn't match" icon={<MaterialIcons name="error-outline" size={13} color="red" />} color="red" />}
           <Field placeholder="Mobile Number" keyboardType="phone-pad" value={data.mobileNumber} onChangeText={(text)=>setData({...data,mobileNumber:text})} /> 
 
           
