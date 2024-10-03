@@ -24,7 +24,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client
 import CountryInfo from './Screens/CountryInfo';
 import CountryScreen from './Screens/CountryScreen';
 import FlagDetection from './Screens/FlagDetection';
-
+import ContributionScreen from './Screens/ContributionScreen';
 
 
 const client = new ApolloClient({
@@ -65,6 +65,7 @@ const HomeStack = () => {
       <Stack.Screen name='CountryScreen' component={CountryScreen} />
       <Stack.Screen name='CountryInfo' component={CountryInfo} />
       <Stack.Screen name='FlagDetection' component={FlagDetection} />
+      <Stack.Screen name='ContributionScreen' component={ContributionScreen} />
     </Stack.Navigator>
   );
 };

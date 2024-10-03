@@ -93,6 +93,9 @@ const Sidebar = ({ onClose }) => {
       <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("Rating")}>
         <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Rating</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("ContributionScreen")}>
+        <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Contribution</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("Search")}>
         <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Search</Text>
       </TouchableOpacity>
