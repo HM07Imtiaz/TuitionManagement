@@ -55,7 +55,8 @@
     "react-native-sass-transformer": "^2.1.1",
     "react-native-screens": "3.31.1",
     "react-native-svg": "^15.5.0",
-    "react-native-webview": "13.8.6"
+    "react-native-webview": "13.8.6",
+    "styled-components": "^6.1.13"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0"
