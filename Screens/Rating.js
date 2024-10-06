@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+/*import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { firebase } from '../firebaseConfig';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -154,9 +154,9 @@ const styles = StyleSheet.create({
 });
 
 export default Rating;
+*/
 
-
-/*import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { firebase } from '../firebaseConfig';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -309,4 +309,3 @@ const styles = StyleSheet.create({
 });
 
 export default Rating;
-*/
