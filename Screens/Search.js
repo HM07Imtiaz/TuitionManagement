@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { firebase } from '../firebaseConfig';
 import TeacherCard from '../Components/TeacherCard';
-//import TeacherDetailsScreen from './TeacherDetailsScreen';
+
 
 const Search = ({ navigation }) => {
   const [teachers, setTeachers] = useState([]);
@@ -24,11 +24,7 @@ const Search = ({ navigation }) => {
   const handleTeacherPress = (teacherId) => {
     navigation.navigate('UserProfile', { userId: teacherId });
   };
-  
-  /* const handleTeacherPress = (teacherId) => {
-    navigation.navigate('TeacherDetailsScreen', { teacherId });
-  };
-  */
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

@@ -75,10 +75,10 @@ const ModelTest = () => {
         });
       }
 
-      console.log(result); // Debug log
+      console.log(result); 
 
       if (!result.canceled) {
-        const localUri = result.assets[0].uri; // Updated to access the correct URI
+        const localUri = result.assets[0].uri; 
         setImageUri(localUri);
 
         const imageTensor = await transformImageToTensor(localUri);

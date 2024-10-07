@@ -26,7 +26,7 @@ const ContributionScreen = () => {
         
         // Calculate contribution based on posts and comments
         let contributionValue = posts * 3 + comments;
-        if (contributionValue > 100) contributionValue = 100; // Cap at 100%
+        if (contributionValue > 100) contributionValue = 100; 
 
         // Determine remark based on contribution percentage
         let remarkText = '';

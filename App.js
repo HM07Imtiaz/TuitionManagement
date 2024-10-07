@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import { View, Text, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WelcomeScreen from './Screens/WelcomeScreen';
@@ -75,7 +76,6 @@ function App() {
 
   const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [initializing, setInitializing] = useState(true);
-  //const [user, setUser] = useState();
 
 
 useEffect(() => {
@@ -122,7 +122,12 @@ useEffect(() => {
 
 
 if (initializing) {
-  return null; 
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <ActivityIndicator size="large" color="#0000ff" />
+      <Text>Loading...</Text>
+    </View>
+  );
 }
 
   return (

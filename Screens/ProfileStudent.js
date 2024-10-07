@@ -13,7 +13,6 @@ const ProfileStudent = ({ navigation }) => {
   const [type, setType] = useState('');
   const [fullName, setFullName] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
-  //const [educationBackground, setEducationBackground] = useState('');
   const [gender, setGender] = useState('');
   const [address, setAddress] = useState('');
   const [about, setAbout] = useState('');
@@ -42,7 +41,6 @@ const ProfileStudent = ({ navigation }) => {
           setType(profileData.type || '');
           setFullName(profileData.fullName || '');
           setMobileNumber(profileData.mobileNumber || '');
-          //setEducationBackground(profileData.educationBackground || '');
           setInstitution(profileData.institution || '');
           setGender(profileData.gender || '');
           setAddress(profileData.address || '');
@@ -191,7 +189,6 @@ const ProfileStudent = ({ navigation }) => {
         userId: user.uid,
         fullName,
         mobileNumber,
-        //educationBackground,
         institution,
         gender,
         address,

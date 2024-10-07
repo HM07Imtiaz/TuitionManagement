@@ -97,7 +97,7 @@ const Sidebar = ({ onClose }) => {
         <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Contribution</Text>
       </TouchableOpacity>
       <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 3}} onPress={() => navigation.navigate("Search")}>
-        <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Search</Text>
+        <Text style={{padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>Search Tutors</Text>
       </TouchableOpacity>
       <TouchableOpacity style={{borderRadius: 5, backgroundColor: 'white', marginBottom: 10}} onPress={handleLogout}>
         <Text style={{color: "red", padding: 20, marginLeft: 40, fontWeight: 'bold', fontSize: 18}}>LogOut</Text>

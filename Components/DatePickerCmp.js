@@ -8,7 +8,7 @@ const DatePickerComponent = ({ onSelectDate }) => {
 
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    setShowPicker(Platform.OS === 'ios'); // For iOS, show the picker until the user confirms the date
+    setShowPicker(Platform.OS === 'ios'); 
     setDate(currentDate);
     onSelectDate(currentDate);
   };
